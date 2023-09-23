@@ -17,7 +17,7 @@ import {
 } from './Loyaut';
 import { fetchContacts } from 'redux/operations';
 
-const customStyles = {
+export const customStyles = {
   content: {
     top: '50%',
     left: '50%',
@@ -36,21 +36,19 @@ export const App = () => {
   const isLoading = useSelector(selectIsLoading);
   const error = useSelector(selectError);
   const contacts = useSelector(selectContacts);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalAddOpen, setIsModalAppOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchContacts());
   }, [dispatch]);
 
-  const openModal = e => 
-  // console.log(e.currentTarget.getAttribute('data-btn'));
-  setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+  const openModalAdd = () => setIsModalAppOpen(true);
+  const closeModalAdd = () => setIsModalAppOpen(false);
 
   return (
     <Layout>
       <Title>Phonebook</Title>
-      <BtnOpen onClick={openModal} data-btn="btn-add">
+      <BtnOpen onClick={openModalAdd} data-btn="btn-add">
         <AiOutlineUserAdd size={45} />
       </BtnOpen>
 
@@ -61,7 +59,7 @@ export const App = () => {
         {contacts.length > 0 ? (
           <div>
             <Filter />
-            <ContactList onClick={openModal} />
+            <ContactList />
           </div>
         ) : (
           <Massage>Contact list is empty</Massage>
@@ -69,14 +67,14 @@ export const App = () => {
       </Contacts>
 
       <Modal
-        isOpen={isModalOpen}
-        onRequestClose={closeModal}
+        isOpen={isModalAddOpen}
+        onRequestClose={closeModalAdd}
         style={customStyles}
       >
-        <BtnClose onClick={closeModal}>
+        <BtnClose onClick={closeModalAdd}>
           <AiOutlineClose size={25} />
         </BtnClose>
-        <ContactForm onClose={closeModal} style={customStyles} />
+        <ContactForm onClose={closeModalAdd} style={customStyles} />
       </Modal>
     </Layout>
   );

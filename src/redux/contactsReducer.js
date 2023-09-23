@@ -1,5 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchContacts, addContact, deleteContact } from './operations';
+import {
+  fetchContacts,
+  addContact,
+  deleteContact,
+  editContact,
+} from './operations';
 
 const handlePending = state => {
   state.contacts.isLoading = true;
@@ -22,11 +27,20 @@ const handleAddContactsFulfilled = (state, action) => {
   state.contacts.items.push(action.payload);
 };
 
+const handleEditContactsFulfilled = (state, action) => {
+  state.contacts.isLoading = false;
+  state.contacts.error = null;
+  const index = state.contacts.items.findIndex(
+    contact => contact.id === action.payload
+  );
+  state.contacts.items.splice(index, 1, action.payload);
+};
+
 const handleDeleteContactsFulfilled = (state, action) => {
   state.contacts.isLoading = false;
   state.contacts.error = null;
   const index = state.contacts.items.findIndex(
-    task => task.id === action.payload
+    contact => contact.id === action.payload
   );
   state.contacts.items.splice(index, 1);
 };
@@ -50,6 +64,9 @@ export const contactsSlice = createSlice({
       .addCase(addContact.pending, handlePending)
       .addCase(addContact.fulfilled, handleAddContactsFulfilled)
       .addCase(addContact.rejected, handleRejected)
+      .addCase(editContact.pending, handlePending)
+      .addCase(editContact.fulfilled, handleEditContactsFulfilled)
+      .addCase(editContact.rejected, handleRejected)
       .addCase(deleteContact.pending, handlePending)
       .addCase(deleteContact.fulfilled, handleDeleteContactsFulfilled)
       .addCase(deleteContact.rejected, handleRejected),
