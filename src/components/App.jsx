@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Modal from 'react-modal';
 import { AiOutlineUserAdd, AiOutlineClose } from 'react-icons/ai';
+import { Hourglass } from 'react-loader-spinner';
 import { selectContacts, selectError, selectIsLoading } from 'redux/selectors';
 import { ContactForm } from './ContactForm/ContactForm';
 import { ContactList } from './ContactList/ContactList';
@@ -54,7 +55,17 @@ export const App = () => {
 
       <Contacts>
         <SubTitle>Contacts</SubTitle>
-        {isLoading && !error && <b>Request in progress...</b>}
+        {isLoading && !error && (
+          <Hourglass
+            visible={true}
+            height="80"
+            width="80"
+            ariaLabel="hourglass-loading"
+            wrapperStyle={{}}
+            wrapperClass=""
+            colors={['#306cce', '#72a1ed']}
+          />
+        )}
 
         {contacts.length > 0 ? (
           <div>
