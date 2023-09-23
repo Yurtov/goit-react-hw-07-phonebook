@@ -1,8 +1,8 @@
 import { Formik } from 'formik';
-import { nanoid } from 'nanoid';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
-import { addContact, getContacts } from 'redux/contactsReducer';
+import { addContact } from 'redux/operations';
+import { selectContacts } from 'redux/selectors';
 import { AiOutlineUser, AiOutlinePhone } from 'react-icons/ai';
 import {
   StyledForm,
@@ -25,7 +25,7 @@ const schema = Yup.object().shape({
       nameRegExp,
       "Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
     ),
-  number: Yup.string()
+  phone: Yup.string()
     .matches(
       phoneRegExp,
       'Phone number must be digits and can contain spaces, dashes, parentheses and can start with +'
@@ -35,13 +35,13 @@ const schema = Yup.object().shape({
 
 export const ContactForm = ({ onClose }) => {
   const dispatch = useDispatch();
-  const contacts = useSelector(getContacts);
+  const contacts = useSelector(selectContacts);
 
   return (
     <Formik
       initialValues={{
         name: '',
-        number: '',
+        phone: '',
       }}
       validationSchema={schema}
       onSubmit={(values, actions) => {
@@ -49,12 +49,11 @@ export const ContactForm = ({ onClose }) => {
           contact =>
             contact.name.toLowerCase().trim() ===
               values.name.toLowerCase().trim() ||
-            contact.number.trim() === values.number.trim()
+            contact.phone.trim() === values.phone.trim()
         )
-          ? alert(`${values.name} or ${values.number} is already in contact`)
+          ? alert(`${values.name} or ${values.phone} is already in contact`)
           : dispatch(
               addContact({
-                id: nanoid(),
                 ...values,
               })
             ) &&
@@ -72,9 +71,9 @@ export const ContactForm = ({ onClose }) => {
 
         <Label>
           Number <AiOutlinePhone />
-          <StyledField name="number" />
+          <StyledField name="phone" />
           <br />
-          <StyledErrorMessage name="number" component="div" />
+          <StyledErrorMessage name="phone" component="div" />
         </Label>
 
         <Button type="submit">Add contact</Button>

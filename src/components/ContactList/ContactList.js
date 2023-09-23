@@ -1,35 +1,42 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { getFilter } from 'redux/selectors';
-import { deleteContact, getContacts } from 'redux/contactsReducer';
-import { AiOutlineDelete } from 'react-icons/ai';
-import { List, ContactItem, Span, DeleteBtn, Stub } from './ContactList.styled';
+import { selectVisibleContacts } from 'redux/selectors';
+import { deleteContact } from 'redux/operations';
+import { AiOutlineEdit, AiOutlineDelete } from 'react-icons/ai';
+import {
+  List,
+  ContactItem,
+  Span,
+  ActionBtn,
+  Stub,
+  BtnContainer,
+} from './ContactList.styled';
 
-export const ContactList = () => {
-  const contacts = useSelector(getContacts);
-  const filter = useSelector(getFilter);
+export const ContactList = ({ onClick }) => {
+  const contacts = useSelector(selectVisibleContacts);
   const dispatch = useDispatch();
-
-  const visiblesContacts = contacts.filter(contact =>
-    contact.name.toLowerCase().includes(filter.toLowerCase())
-  );
 
   return (
     <List>
-      {visiblesContacts.length !== 0 ? (
-        visiblesContacts
+      {contacts.length !== 0 ? (
+        contacts
           .sort((a, b) => a.name.localeCompare(b.name))
           .map(contact => (
             <ContactItem key={contact.id}>
               <Span>
-                {contact.name}: {contact.number}
-                <DeleteBtn
-                  type="button"
-                  onClick={() => {
-                    dispatch(deleteContact(contact.id));
-                  }}
-                >
-                  <AiOutlineDelete size={27} />
-                </DeleteBtn>
+                {contact.name}: {contact.phone}
+                <BtnContainer>
+                  <ActionBtn type="button" onClick={onClick} data-btn="btn-change">
+                    <AiOutlineEdit size={27} />
+                  </ActionBtn>
+                  <ActionBtn
+                    type="button"
+                    onClick={() => {
+                      dispatch(deleteContact(contact.id));
+                    }}
+                  >
+                    <AiOutlineDelete size={27} />
+                  </ActionBtn>
+                </BtnContainer>
               </Span>
             </ContactItem>
           ))

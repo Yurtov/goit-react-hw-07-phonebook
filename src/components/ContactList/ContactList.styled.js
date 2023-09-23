@@ -8,8 +8,7 @@ export const List = styled.ul`
   font-size: 25px;
 `;
 
-export const ContactItem = styled.li`
-`;
+export const ContactItem = styled.li``;
 
 export const Span = styled.span`
   display: flex;
@@ -18,7 +17,12 @@ export const Span = styled.span`
   align-items: center;
 `;
 
-export const DeleteBtn = styled.button`
+export const BtnContainer = styled.div`
+  display: flex;
+  gap: 5px;
+`;
+
+export const ActionBtn = styled.button`
   border: none;
   display: flex;
   align-items: center;

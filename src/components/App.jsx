@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import Modal from 'react-modal';
 import { AiOutlineUserAdd, AiOutlineClose } from 'react-icons/ai';
+import { selectContacts, selectError, selectIsLoading } from 'redux/selectors';
 import { ContactForm } from './ContactForm/ContactForm';
 import { ContactList } from './ContactList/ContactList';
 import { Filter } from './Filter/Filter';
@@ -13,10 +15,7 @@ import {
   SubTitle,
   Massage,
 } from './Loyaut';
-import { useSelector } from 'react-redux';
-import { getContacts } from 'redux/contactsReducer';
-
-const localStorageKey = 'contacts';
+import { fetchContacts } from 'redux/operations';
 
 const customStyles = {
   content: {
@@ -32,35 +31,37 @@ const customStyles = {
 
 Modal.setAppElement('#root');
 
-export const getInitialContacts = () => {
-  const savedContacts = localStorage.getItem(localStorageKey);
-  if (savedContacts !== null) {
-    return JSON.parse(savedContacts);
-  }
-  return [];
-};
-
 export const App = () => {
-  const contacts = useSelector(getContacts);
+  const dispatch = useDispatch();
+  const isLoading = useSelector(selectIsLoading);
+  const error = useSelector(selectError);
+  const contacts = useSelector(selectContacts);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const openModal = () => setIsModalOpen(true);
+  useEffect(() => {
+    dispatch(fetchContacts());
+  }, [dispatch]);
+
+  const openModal = e => 
+  // console.log(e.currentTarget.getAttribute('data-btn'));
+  setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
   return (
     <Layout>
       <Title>Phonebook</Title>
-      <BtnOpen onClick={openModal}>
+      <BtnOpen onClick={openModal} data-btn="btn-add">
         <AiOutlineUserAdd size={45} />
       </BtnOpen>
 
       <Contacts>
         <SubTitle>Contacts</SubTitle>
+        {isLoading && !error && <b>Request in progress...</b>}
 
         {contacts.length > 0 ? (
           <div>
             <Filter />
-            <ContactList />
+            <ContactList onClick={openModal} />
           </div>
         ) : (
           <Massage>Contact list is empty</Massage>
@@ -75,11 +76,7 @@ export const App = () => {
         <BtnClose onClick={closeModal}>
           <AiOutlineClose size={25} />
         </BtnClose>
-        <ContactForm
-          // onAddContact={addContact}
-          onClose={closeModal}
-          style={customStyles}
-        />
+        <ContactForm onClose={closeModal} style={customStyles} />
       </Modal>
     </Layout>
   );

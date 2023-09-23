@@ -1,11 +1,11 @@
 import { Label, Input } from './Filter.styled';
 import { AiOutlineFileSearch } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
-import { getFilter } from 'redux/selectors';
+import { selectFilter } from 'redux/selectors';
 import { setContactsFilter } from 'redux/filterReducer';
 
 export const Filter = () => {
-  const filter = useSelector(getFilter);
+  const filter = useSelector(selectFilter);
   const dispatch = useDispatch();
 
   const changeInputValue = e => {
