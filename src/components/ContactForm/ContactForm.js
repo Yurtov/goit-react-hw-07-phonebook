@@ -2,8 +2,9 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import { addContact } from 'redux/operations';
-import { selectContacts } from 'redux/selectors';
+import { selectContacts, selectError, selectIsLoading } from 'redux/selectors';
 import { AiOutlineUser, AiOutlinePhone } from 'react-icons/ai';
+import { RotatingLines } from 'react-loader-spinner';
 import {
   StyledForm,
   Label,
@@ -33,9 +34,11 @@ const schema = Yup.object().shape({
     .required('Required'),
 });
 
-export const ContactForm = ({ onClose }) => {
+export const ContactForm = ({ onClose, toastAdd, toastErrorAdd }) => {
   const dispatch = useDispatch();
   const contacts = useSelector(selectContacts);
+  const isLoading = useSelector(selectIsLoading);
+  const error = useSelector(selectError);
 
   return (
     <Formik
@@ -51,14 +54,16 @@ export const ContactForm = ({ onClose }) => {
               values.name.toLowerCase().trim() ||
             contact.phone.trim() === values.phone.trim()
         )
-          ? alert(`${values.name} or ${values.phone} is already in contact`)
+          ? toastErrorAdd(values.name, values.phone)
           : dispatch(
               addContact({
                 ...values,
               })
             ) &&
-            onClose() &&
-            actions.resetForm();
+            !isLoading &&
+            !error &&
+            toastAdd() &&
+            setTimeout(() => onClose() && actions.resetForm(), 500);
       }}
     >
       <StyledForm>
@@ -76,7 +81,18 @@ export const ContactForm = ({ onClose }) => {
           <StyledErrorMessage name="phone" component="div" />
         </Label>
 
-        <Button type="submit">Add contact</Button>
+        <Button type="submit">
+          Add contact
+          {isLoading && !error && (
+            <RotatingLines
+              strokeColor="grey"
+              strokeWidth="5"
+              animationDuration="0.75"
+              width="20"
+              visible={true}
+            />
+          )}
+        </Button>
       </StyledForm>
     </Formik>
   );

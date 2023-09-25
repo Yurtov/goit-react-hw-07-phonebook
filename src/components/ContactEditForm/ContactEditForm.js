@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { RotatingLines } from 'react-loader-spinner';
 import { editContact } from 'redux/operations';
 import { AiOutlineUser, AiOutlinePhone } from 'react-icons/ai';
 import {
@@ -10,7 +12,7 @@ import {
   StyledErrorMessage,
   Button,
 } from './ContactEditForm.styled';
-import { useState } from 'react';
+import { selectError, selectIsLoading } from 'redux/selectors';
 
 const nameRegExp = /^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$/;
 const phoneRegExp =
@@ -33,9 +35,26 @@ const schema = Yup.object().shape({
     .required('Required'),
 });
 
-export const ContactEditForm = ({ onClose, contact }) => {
+export const ContactEditForm = ({ onClose, contact, toastEdit }) => {
   const dispatch = useDispatch();
-  const [contactToEdit, setContactToEdit] = useState({ id: contact.id });
+  const [contactToEdit, setContactToEdit] = useState({
+    id: contact.id,
+    name: contact.name,
+    phone: contact.phone,
+  });
+  const isLoading = useSelector(selectIsLoading);
+  const error = useSelector(selectError);
+
+  const handleChange = e => {
+    const targetName = e.target.name;
+    const values = e.target.value;
+    if (targetName === 'name') {
+      setContactToEdit(prevState => ({ ...prevState, name: values }));
+    }
+    if (targetName === 'phone') {
+      setContactToEdit(prevState => ({ ...prevState, phone: values }));
+    }
+  };
 
   return (
     <Formik
@@ -44,31 +63,39 @@ export const ContactEditForm = ({ onClose, contact }) => {
         phone: `${contact.phone}`,
       }}
       validationSchema={schema}
-      onSubmit={values => {
-        setContactToEdit(prevState => ({
-          ...prevState,
-          ...values,
-        }));
-        dispatch(editContact(contactToEdit));
-        onClose();
+      onSubmit={() => {
+        dispatch(editContact(contactToEdit)) &&
+          toastEdit() &&
+          setTimeout(() => onClose(), 500);
       }}
     >
       <StyledForm>
-        <Label>
+        <Label onChange={handleChange}>
           Name <AiOutlineUser />
           <StyledField name="name" />
           <br />
           <StyledErrorMessage name="name" component="div" />
         </Label>
 
-        <Label>
+        <Label onChange={handleChange}>
           Number <AiOutlinePhone />
           <StyledField name="phone" />
           <br />
           <StyledErrorMessage name="phone" component="div" />
         </Label>
 
-        <Button type="submit">Add contact</Button>
+        <Button type="submit">
+          Edit contact
+          {isLoading && !error && (
+            <RotatingLines
+              strokeColor="grey"
+              strokeWidth="5"
+              animationDuration="0.75"
+              width="20"
+              visible={true}
+            />
+          )}
+        </Button>
       </StyledForm>
     </Formik>
   );

@@ -4,6 +4,7 @@ import Modal from 'react-modal';
 import { selectVisibleContacts } from 'redux/selectors';
 import { deleteContact } from 'redux/operations';
 import { AiOutlineEdit, AiOutlineDelete, AiOutlineClose } from 'react-icons/ai';
+
 import {
   List,
   ContactItem,
@@ -16,7 +17,7 @@ import { BtnClose } from '../Loyaut';
 import { customStyles } from '../App';
 import { ContactEditForm } from 'components/ContactEditForm/ContactEditForm';
 
-export const ContactList = () => {
+export const ContactList = ({ toastDelete, toastEdit }) => {
   const contacts = useSelector(selectVisibleContacts);
   const dispatch = useDispatch();
   const [isModalEditOpen, setIsModalEditOpen] = useState(false);
@@ -55,7 +56,7 @@ export const ContactList = () => {
                     <ActionBtn
                       type="button"
                       onClick={() => {
-                        dispatch(deleteContact(contact.id));
+                        dispatch(deleteContact(contact.id)) && toastDelete();
                       }}
                     >
                       <AiOutlineDelete size={27} />
@@ -78,6 +79,7 @@ export const ContactList = () => {
         </BtnClose>
         <ContactEditForm
           onClose={closeModalEdit}
+          toastEdit={toastEdit}
           style={customStyles}
           contact={contact}
         />

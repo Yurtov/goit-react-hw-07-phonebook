@@ -31,4 +31,8 @@ export const Button = styled.button`
   font-size: 20px;
   cursor: pointer;
   width: 250px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
 `;

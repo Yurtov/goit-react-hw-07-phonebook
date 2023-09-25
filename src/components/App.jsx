@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Modal from 'react-modal';
+import toast, { Toaster } from 'react-hot-toast';
 import { AiOutlineUserAdd, AiOutlineClose } from 'react-icons/ai';
 import { Hourglass } from 'react-loader-spinner';
 import { selectContacts, selectError, selectIsLoading } from 'redux/selectors';
@@ -38,10 +39,22 @@ export const App = () => {
   const error = useSelector(selectError);
   const contacts = useSelector(selectContacts);
   const [isModalAddOpen, setIsModalAppOpen] = useState(false);
+  const [loaderVisibility, setLoaderVisibility] = useState(false);
 
   useEffect(() => {
     dispatch(fetchContacts());
   }, [dispatch]);
+
+  useEffect(() => {
+    setLoaderVisibility(true)
+    setTimeout(() => setLoaderVisibility(false), 1000);
+  }, []);
+
+  const ToastAddSuccess = () => toast.success('Contact add to your phonebook');
+  const ToastAlreadyHaveContact = (name, phone) =>
+    toast.error(`${name} or ${phone} is already in contact`);
+  const ToastDelete = () => toast.success('Contact delete from your phonebook');
+  const ToastEditSuccess = () => toast.success('Contact edit success');
 
   const openModalAdd = () => setIsModalAppOpen(true);
   const closeModalAdd = () => setIsModalAppOpen(false);
@@ -55,7 +68,7 @@ export const App = () => {
 
       <Contacts>
         <SubTitle>Contacts</SubTitle>
-        {isLoading && !error && (
+        {loaderVisibility && isLoading && !error && (
           <Hourglass
             visible={true}
             height="80"
@@ -66,11 +79,13 @@ export const App = () => {
             colors={['#306cce', '#72a1ed']}
           />
         )}
-
         {contacts.length > 0 ? (
           <div>
             <Filter />
-            <ContactList />
+            <ContactList
+              toastDelete={ToastDelete}
+              toastEdit={ToastEditSuccess}
+            />
           </div>
         ) : (
           <Massage>Contact list is empty</Massage>
@@ -85,8 +100,14 @@ export const App = () => {
         <BtnClose onClick={closeModalAdd}>
           <AiOutlineClose size={25} />
         </BtnClose>
-        <ContactForm onClose={closeModalAdd} style={customStyles} />
+        <ContactForm
+          onClose={closeModalAdd}
+          style={customStyles}
+          toastAdd={ToastAddSuccess}
+          toastErrorAdd={ToastAlreadyHaveContact}
+        />
       </Modal>
+      <Toaster position="top-center" reverseOrder={false} />
     </Layout>
   );
 };
